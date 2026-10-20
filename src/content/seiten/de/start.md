@@ -4,7 +4,7 @@ beschreibung: Nordwerk fertigt Ersatzteile, Prototypen und Kleinserien auf Abruf
 uebersetzung: start
 pfad: ""
 kicker: Fiktive Demo-Firma
-headline: Bauteile genau dann, wenn Sie sie brauchen.
+headline: Ersatzteile in Tagen statt Monaten.
 intro: Sie schicken uns Zeichnung und Stückzahl. Wir finden das passende Verfahren, fertigen im geprüften Netzwerk und liefern einbaufertig.
 vorteile:
   - titel: Ein Ansprechpartner
@@ -13,6 +13,8 @@ vorteile:
     text: Einzelteile oft in wenigen Tagen, Serien nach Plan. Ohne volles Lager.
   - titel: Geprüfte Qualität
     text: Jedes Teil kommt mit Prüfbericht. Gefertigt nach industriellen Standards.
+  - titel: Weltweit gefertigt
+    text: Unser Netzwerk fertigt dort, wo Sie das Teil brauchen.
 button_text: Angebot anfragen
 button_ziel: kontakt
 news_anzeigen: true
