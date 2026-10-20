@@ -1,0 +1,51 @@
+# Vorschau: Fuer jede vorgeschlagene Aenderung (Pull Request) wird automatisch
+# eine eigene Vorschau-Seite gebaut. Der Link erscheint als Kommentar im Pull Request.
+# Wird der Pull Request geschlossen, verschwindet die Vorschau wieder.
+
+name: Vorschau
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+
+concurrency: vorschau-${{ github.ref }}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  vorschau:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        if: github.event.action != 'closed'
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Abhaengigkeiten installieren
+        if: github.event.action != 'closed'
+        run: npm ci
+
+      - name: Pruefen, ob alle Sprachversionen da sind
+        if: github.event.action != 'closed'
+        run: npm run check:content
+
+      - name: Vorschau bauen
+        if: github.event.action != 'closed'
+        env:
+          SITE_URL: https://${{ github.repository_owner }}.github.io
+          BASE_PATH: /${{ github.event.repository.name }}/pr-preview/pr-${{ github.event.number }}/
+        run: npm run build
+
+      - name: Vorschau veroeffentlichen und Link posten
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./dist/
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview
+          action: auto
+          comment: true

@@ -1,0 +1,17 @@
+{
+  "name": "demo-website-claude-workflow",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check:content": "node scripts/check-translations.mjs"
+  },
+  "dependencies": {
+    "astro": "^7.4.1",
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}

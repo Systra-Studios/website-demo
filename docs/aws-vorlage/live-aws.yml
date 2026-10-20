@@ -1,0 +1,61 @@
+# VORLAGE fuer das echte Projekt auf AWS (S3 + CloudFront). In der Demo nicht aktiv.
+# Zum Aktivieren nach .github/workflows/ kopieren und die vier Variablen im Repository
+# unter Settings > Secrets and variables > Actions > Variables anlegen:
+#   AWS_ROLE_ARN        IAM-Rolle, die GitHub per OIDC annehmen darf
+#   AWS_REGION          z. B. eu-central-1
+#   S3_BUCKET           Bucket mit den Website-Dateien
+#   CLOUDFRONT_ID       ID der CloudFront-Distribution
+# Es werden keine dauerhaften Zugangsschluessel gespeichert.
+
+name: Livegang (AWS)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency: livegang
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run check:content
+
+      - name: Website bauen
+        env:
+          SITE_URL: https://www.example.com
+          BASE_PATH: /
+        run: npm run build
+
+      - name: Bei AWS anmelden (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Dateien hochladen
+        run: |
+          # Bilder, Skripte und Styles lange cachen (Dateinamen enthalten einen Hash)
+          aws s3 sync dist/ "s3://${{ vars.S3_BUCKET }}/" --delete \
+            --exclude "*.html" --cache-control "public,max-age=31536000,immutable"
+          # HTML immer frisch ausliefern
+          aws s3 sync dist/ "s3://${{ vars.S3_BUCKET }}/" --delete \
+            --exclude "*" --include "*.html" --cache-control "public,max-age=0,must-revalidate"
+
+      - name: CloudFront-Cache leeren
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.CLOUDFRONT_ID }}" --paths "/*"

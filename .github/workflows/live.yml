@@ -1,0 +1,48 @@
+# Livegang: Sobald eine Aenderung freigegeben ist (Merge in "main"),
+# wird die Website neu gebaut und veroeffentlicht. Niemand muss etwas anklicken.
+#
+# Demo: veroeffentlicht auf GitHub Pages.
+# Fuer AWS (S3 + CloudFront) siehe docs/aws-vorlage/live-aws.yml
+
+name: Livegang
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency: livegang
+
+permissions:
+  contents: write
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Abhaengigkeiten installieren
+        run: npm ci
+
+      - name: Pruefen, ob alle Sprachversionen da sind
+        run: npm run check:content
+
+      - name: Website bauen
+        env:
+          SITE_URL: https://${{ github.repository_owner }}.github.io
+          BASE_PATH: /${{ github.event.repository.name }}/
+        run: npm run build
+
+      - name: Veroeffentlichen
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
+          branch: gh-pages
+          clean-exclude: pr-preview
+          force: false

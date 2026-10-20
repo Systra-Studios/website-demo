@@ -1,0 +1,104 @@
+---
+import '../styles/global.css';
+import { getCollection } from 'astro:content';
+import { sprachen, t, type Sprache } from '../i18n/ui';
+import { link, linkZu, spracheVon } from '../lib/links';
+
+interface Props {
+  sprache: Sprache;
+  titel: string;
+  beschreibung: string;
+  versionen: { sprache: Sprache; href: string }[];
+  aktuellerLink: string;
+}
+
+const { sprache, titel, beschreibung, versionen, aktuellerLink } = Astro.props;
+
+const menue = (await getCollection('seiten'))
+  .filter((s) => spracheVon(s) === sprache && s.data.im_menue)
+  .sort((a, b) => a.data.reihenfolge - b.data.reihenfolge);
+
+const startseite = link(sprache === 'de' ? '' : sprache);
+const absolut = (href: string) => new URL(href, Astro.site).toString();
+const fallbackStart = (s: Sprache) => link(s === 'de' ? '' : s);
+---
+
+<!doctype html>
+<html lang={sprache}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titel} | Nordwerk</title>
+    <meta name="description" content={beschreibung} />
+    <link rel="canonical" href={absolut(aktuellerLink)} />
+    {versionen.map((v) => <link rel="alternate" hreflang={v.sprache} href={absolut(v.href)} />)}
+    {versionen.find((v) => v.sprache === 'de') && (
+      <link rel="alternate" hreflang="x-default" href={absolut(versionen.find((v) => v.sprache === 'de')!.href)} />
+    )}
+    <link rel="icon" href={link('favicon.svg').replace(/\/$/, '')} type="image/svg+xml" />
+  </head>
+  <body class="min-h-screen flex flex-col font-sans">
+    <a href="#inhalt" class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 bg-white px-3 py-2 rounded">
+      {t(sprache, 'skip')}
+    </a>
+
+    <header class="w-full">
+      <div class="mx-auto max-w-6xl px-5 sm:px-8 py-5 flex items-center justify-between gap-6">
+        <a href={startseite} class="text-[1.15rem] font-bold tracking-tight">nordwerk<span class="text-akzent">.</span></a>
+
+        <nav aria-label={t(sprache, 'nav.label')} class="hidden md:block">
+          <ul class="flex items-center gap-7 text-[0.95rem] text-grau">
+            {menue.map((s) => {
+              const href = linkZu(s);
+              const aktiv = href === aktuellerLink;
+              return (
+                <li>
+                  <a href={href} aria-current={aktiv ? 'page' : undefined} class:list={['hover:text-tinte transition-colors', aktiv && 'text-tinte font-medium']}>
+                    {s.data.menuename ?? s.data.titel}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        <div role="group" aria-label={t(sprache, 'sprache.label')} class="flex items-center gap-1 bg-flaeche rounded-full p-1 text-sm">
+          {(Object.keys(sprachen) as Sprache[]).map((s) => {
+            const ziel = versionen.find((v) => v.sprache === s)?.href ?? fallbackStart(s);
+            return (
+              <a
+                href={ziel}
+                hreflang={s}
+                lang={s}
+                aria-current={s === sprache ? 'true' : undefined}
+                title={sprachen[s]}
+                class:list={['px-3 py-1 rounded-full uppercase tracking-wide text-[0.8rem]', s === sprache ? 'bg-white text-tinte font-semibold' : 'text-grau hover:text-tinte']}
+              >
+                {s}
+              </a>
+            );
+          })}
+        </div>
+      </div>
+
+      <nav aria-label={t(sprache, 'nav.label')} class="md:hidden px-5 pb-3">
+        <ul class="flex gap-5 overflow-x-auto text-[0.95rem] text-grau">
+          {menue.map((s) => (
+            <li class="shrink-0"><a href={linkZu(s)}>{s.data.menuename ?? s.data.titel}</a></li>
+          ))}
+        </ul>
+      </nav>
+    </header>
+
+    <main id="inhalt" class="flex-1">
+      <slot />
+    </main>
+
+    <footer class="mt-24 bg-flaeche">
+      <div class="mx-auto max-w-6xl px-5 sm:px-8 py-10 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between text-sm text-grau">
+        <p>© {new Date().getFullYear()} {t(sprache, 'footer.rechte')}</p>
+        <p class="max-w-md">{t(sprache, 'footer.demo')}</p>
+      </div>
+    </footer>
+  </body>
+</html>

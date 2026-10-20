@@ -1,0 +1,17 @@
+---
+import Basis from '../layouts/Basis.astro';
+import { t } from '../i18n/ui';
+import { link } from '../lib/links';
+---
+
+<Basis sprache="de" titel="404" beschreibung={t('de', '404.titel')} versionen={[]} aktuellerLink={link('404')}>
+  <section class="mx-auto max-w-6xl px-5 sm:px-8 pt-24">
+    <h1 class="text-4xl sm:text-5xl font-bold tracking-tight">{t('de', '404.titel')}</h1>
+    <p class="mt-5 text-lg text-grau">
+      <a class="text-akzent underline underline-offset-4" href={link('')}>{t('de', '404.text')}</a>
+    </p>
+    <p class="mt-3 text-grau" lang="en">
+      <a class="underline underline-offset-4" href={link('en')}>{t('en', '404.text')}</a>
+    </p>
+  </section>
+</Basis>
