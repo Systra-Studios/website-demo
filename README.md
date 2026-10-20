@@ -13,7 +13,6 @@ Eine kleine zweisprachige Website (Deutsch und Englisch) mit erfundener Firma. S
 |---|---|
 | `CLAUDE.md` | Anleitung für Claude: wo was liegt, Regeln, Ablauf |
 | `ANLEITUNG-MARKETING.md` | Anleitung für das Marketing-Team |
-| `VIDEO-DREHBUCH.md` | Ablauf für das Demo-Video |
 
 ## Einrichtung (einmalig, ca. 10 Minuten)
 
