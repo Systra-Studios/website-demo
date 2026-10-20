@@ -4,7 +4,7 @@ beschreibung: Nordwerk produces spare parts, prototypes and small series on dema
 uebersetzung: start
 pfad: ""
 kicker: Fictional demo company
-headline: Parts exactly when you need them.
+headline: Spare parts in days, not months.
 intro: Send us your drawing and quantity. We pick the right process, manufacture in our vetted network and deliver ready to install.
 vorteile:
   - titel: One contact
@@ -13,6 +13,8 @@ vorteile:
     text: Single parts often within days, series on schedule. Without a full warehouse.
   - titel: Verified quality
     text: Every part ships with an inspection report. Made to industrial standards.
+  - titel: Made worldwide
+    text: Our network manufactures wherever you need the part.
 button_text: Request a quote
 button_ziel: contact
 news_anzeigen: true
